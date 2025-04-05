@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatórios | Finanças Pessoais</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            danger: '#EF4444',
+            warning: '#F59E0B',
+            dark: '#1F2937',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <div class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <a href="index.html" class="flex items-center space-x-2">
+          <i class="fas fa-wallet text-primary text-2xl"></i>
+          <h1 class="text-xl font-bold text-dark">Meu Controle Financeiro</h1>
+        </a>
+        <nav class="hidden md:flex space-x-6">
+          <a href="index.html" class="text-gray-600 hover:text-primary">Resumo</a>
+          <a href="transacoes.html" class="text-gray-600 hover:text-primary">Transações</a>
+          <a href="metas.html" class="text-gray-600 hover:text-primary">Metas</a>
+          <a href="relatorios.html" class="text-primary font-medium">Relatórios</a>
+          <a href="config.html" class="text-gray-600 hover:text-primary">Configurações</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+          <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white cursor-pointer">
+            <i class="fas fa-user"></i>
+          </div>
+          <button class="md:hidden text-gray-600" id="mobileMenuButton">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden bg-white py-2 px-4 shadow-md">
+        <a href="index.html" class="block py-2 text-gray-600 hover:text-primary">Resumo</a>
+        <a href="transacoes.html" class="block py-2 text-gray-600 hover:text-primary">Transações</a>
+        <a href="metas.html" class="block py-2 text-gray-600 hover:text-primary">Metas</a>
+        <a href="relatorios.html" class="block py-2 text-primary font-medium">Relatórios</a>
+        <a href="config.html" class="block py-2 text-gray-600 hover:text-primary">Configurações</a>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+      <h2 class="text-2xl font-bold text-dark mb-8">Relatórios Financeiros</h2>
+      
+      <!-- Filtros -->
+      <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Relatório</label>
+            <select id="reportType" class="w-full border border-gray-300 rounded-md px-3 py-2">
+              <option value="monthly">Mensal</option>
+              <option value="category">Por Categoria</option>
+              <option value="income-vs-expense">Receitas vs Despesas</option>
+              <option value="goals">Progresso de Metas</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Período</label>
+            <select id="reportPeriod" class="w-full border border-gray-300 rounded-md px-3 py-2">
+              <option value="current-month">Este Mês</option>
+              <option value="last-month">Mês Anterior</option>
+              <option value="last-3-months">Últimos 3 Meses</option>
+              <option value="current-year">Este Ano</option>
+              <option value="custom">Personalizado</option>
+            </select>
+          </div>
+          <div id="customStartDateContainer" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data Inicial</label>
+            <input type="date" id="customStartDate" class="w-full border border-gray-300 rounded-md px-3 py-2">
+          </div>
+          <div id="customEndDateContainer" class="hidden">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Data Final</label>
+            <input type="date" id="customEndDate" class="w-full border border-gray-300 rounded-md px-3 py-2">
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button onclick="FinanceApp.generateReport()" class="bg-primary text-white px-4 py-2 rounded-md mr-2">
+            Gerar Relatório
+          </button>
+          <button onclick="FinanceApp.exportReport()" class="bg-secondary text-white px-4 py-2 rounded-md">
+            Exportar PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Resultados do Relatório -->
+      <div class="bg-white p-6 rounded-lg shadow-sm mb-8 hidden" id="reportResults">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-lg font-semibold text-dark" id="reportTitle">Relatório Mensal</h3>
+          <div class="text-sm text-gray-500" id="reportPeriodText">Junho 2023</div>
+        </div>
+        
+        <!-- Gráficos -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div class="chart-container">
+            <canvas id="mainChart" height="300"></canvas>
+          </div>
+          <div class="chart-container">
+            <canvas id="secondaryChart" height="300"></canvas>
+          </div>
+        </div>
+        
+        <!-- Tabela de Dados -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr id="reportTableHeader">
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mês</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Receitas</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Despesas</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" id="reportTableBody">
+              <!-- Dados serão preenchidos dinamicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- (Opcional: Resumo Financeiro ou outras seções podem ser adicionados aqui) -->
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="db.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Menu mobile
+    document.getElementById('mobileMenuButton').addEventListener('click', function() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    });
+    // Configura datas padrão para os filtros
+    document.addEventListener('DOMContentLoaded', function() {
+      const today = new Date();
+      document.getElementById('customEndDate').value = today.toISOString().split('T')[0];
+      const startDate = new Date();
+      startDate.setDate(1);
+      document.getElementById('customStartDate').value = startDate.toISOString().split('T')[0];
+      document.getElementById('reportPeriod').addEventListener('change', function() {
+        const isCustom = this.value === 'custom';
+        document.getElementById('customStartDateContainer').classList.toggle('hidden', !isCustom);
+        document.getElementById('customEndDateContainer').classList.toggle('hidden', !isCustom);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transações | Finanças Pessoais</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            danger: '#EF4444',
+            warning: '#F59E0B',
+            dark: '#1F2937',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <div class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <a href="index.html" class="flex items-center space-x-2">
+          <i class="fas fa-wallet text-primary text-2xl"></i>
+          <h1 class="text-xl font-bold text-dark">Meu Controle Financeiro</h1>
+        </a>
+        <nav class="hidden md:flex space-x-6">
+          <a href="index.html" class="text-gray-600 hover:text-primary">Resumo</a>
+          <a href="transacoes.html" class="text-primary font-medium">Transações</a>
+          <a href="metas.html" class="text-gray-600 hover:text-primary">Metas</a>
+          <a href="relatorios.html" class="text-gray-600 hover:text-primary">Relatórios</a>
+          <a href="config.html" class="text-gray-600 hover:text-primary">Configurações</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+          <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white cursor-pointer">
+            <i class="fas fa-user"></i>
+          </div>
+          <button class="md:hidden text-gray-600" id="mobileMenuButton">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden bg-white py-2 px-4 shadow-md">
+        <a href="index.html" class="block py-2 text-gray-600 hover:text-primary">Resumo</a>
+        <a href="transacoes.html" class="block py-2 text-primary font-medium">Transações</a>
+        <a href="metas.html" class="block py-2 text-gray-600 hover:text-primary">Metas</a>
+        <a href="relatorios.html" class="block py-2 text-gray-600 hover:text-primary">Relatórios</a>
+        <a href="config.html" class="block py-2 text-gray-600 hover:text-primary">Configurações</a>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold text-dark">Minhas Transações</h2>
+        <button onclick="openModal('addTransactionModal')" class="bg-primary hover:bg-blue-600 text-white py-2 px-4 rounded-md flex items-center">
+          <i class="fas fa-plus mr-2"></i> Nova Transação
+        </button>
+      </div>
+
+      <!-- Filtros -->
+      <div class="bg-white p-4 rounded-lg shadow-sm mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            <select id="filterType" class="w-full border border-gray-300 rounded-md px-3 py-2">
+              <option value="all">Todos</option>
+              <option value="income">Receitas</option>
+              <option value="expense">Despesas</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+            <select id="filterCategory" class="w-full border border-gray-300 rounded-md px-3 py-2">
+              <option value="all">Todas</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">De</label>
+            <input type="date" id="filterStartDate" class="w-full border border-gray-300 rounded-md px-3 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Até</label>
+            <input type="date" id="filterEndDate" class="w-full border border-gray-300 rounded-md px-3 py-2">
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button id="applyFilters" class="bg-primary text-white px-4 py-2 rounded-md mr-2">
+            Aplicar
+          </button>
+          <button id="resetFilters" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md">
+            Limpar
+          </button>
+        </div>
+      </div>
+
+      <!-- Lista de transações -->
+      <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsList" class="bg-white divide-y divide-gray-200">
+              <!-- Transações serão carregadas aqui -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal para adicionar/editar transação -->
+  <div id="addTransactionModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                Adicionar Nova Transação
+              </h3>
+              <form id="transactionForm" class="space-y-4">
+                <div>
+                  <label for="transactionType" class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                  <select id="transactionType" class="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                    <option value="expense">Despesa</option>
+                    <option value="income">Receita</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label for="transactionAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor</label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-gray-500">R$</span>
+                    </div>
+                    <input type="number" step="0.01" id="transactionAmount" class="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="0,00" required>
+                  </div>
+                </div>
+                
+                <div>
+                  <label for="transactionCategory" class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                  <select id="transactionCategory" class="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary">
+                    <option value="">Selecione uma categoria</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label for="transactionDate" class="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                  <input type="date" id="transactionDate" class="block w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" required>
+                </div>
+                
+                <div>
+                  <label for="transactionDescription" class="block text-sm font-medium text-gray-700 mb-1">Descrição (opcional)</label>
+                  <textarea id="transactionDescription" rows="3" class="block w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="Ex: Jantar com amigos"></textarea>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" id="submitTransaction" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm" type="button">
+            Adicionar
+          </button>
+          <button type="button" onclick="closeModal('addTransactionModal')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="db.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Menu mobile
+    document.getElementById('mobileMenuButton').addEventListener('click', function() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    });
+  </script>
+
+<!-- Modal para adicionar transações -->
+<div id="addTransactionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+    <h2 class="text-lg font-semibold mb-4">Adicionar Transação</h2>
+    <form id="transactionForm">
+      <input type="hidden" id="transactionId">
+      <div class="mb-4">
+        <label for="transactionType">Tipo:</label>
+        <select id="transactionType" required>
+          <option value="income">Receita</option>
+          <option value="expense">Despesa</option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label for="transactionAmount">Valor:</label>
+        <input type="number" id="transactionAmount" required>
+      </div>
+      <div class="mb-4">
+        <label for="transactionCategory">Categoria:</label>
+        <select id="transactionCategory"></select>
+      </div>
+      <div class="mb-4">
+        <label for="transactionDate">Data:</label>
+        <input type="date" id="transactionDate" required>
+      </div>
+      <div class="mb-4">
+        <label for="transactionDescription">Descrição:</label>
+        <input type="text" id="transactionDescription">
+      </div>
+      <div class="flex justify-end space-x-4">
+        <button type="button" onclick="closeModal('addTransactionModal')" class="bg-gray-300 px-4 py-2 rounded">Cancelar</button>
+        <button type="button" id="submitTransaction" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

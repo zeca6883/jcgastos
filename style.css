@@ -1,0 +1,97 @@
+/* ===== ESTILOS GERAIS ===== */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #1F2937;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Cores temáticas */
+.text-primary { color: #3B82F6; }
+.bg-primary { background-color: #3B82F6; }
+.text-secondary { color: #10B981; }
+.bg-secondary { background-color: #10B981; }
+.text-danger { color: #EF4444; }
+.bg-danger { background-color: #EF4444; }
+.text-warning { color: #F59E0B; }
+.bg-warning { background-color: #F59E0B; }
+.text-dark { color: #1F2937; }
+.bg-dark { background-color: #1F2937; }
+
+/* Estilos para modais */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Estilos para tabelas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+th {
+  background-color: #F9FAFB;
+  font-weight: 600;
+  color: #4B5563;
+}
+
+/* Estilos para botões */
+button {
+  transition: all 0.2s;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Estilos para gráficos */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Estilos para categorias */
+.category-color {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .grid {
+      grid-template-columns: 1fr;
+  }
+  
+  .modal-content {
+      width: 95%;
+  }
+}

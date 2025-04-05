@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metas | Finanças Pessoais</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3B82F6',
+            secondary: '#10B981',
+            danger: '#EF4444',
+            warning: '#F59E0B',
+            dark: '#1F2937',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 font-sans">
+  <div class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <a href="index.html" class="flex items-center space-x-2">
+          <i class="fas fa-wallet text-primary text-2xl"></i>
+          <h1 class="text-xl font-bold text-dark">Meu Controle Financeiro</h1>
+        </a>
+        <nav class="hidden md:flex space-x-6">
+          <a href="index.html" class="text-gray-600 hover:text-primary">Resumo</a>
+          <a href="transacoes.html" class="text-gray-600 hover:text-primary">Transações</a>
+          <a href="metas.html" class="text-primary font-medium">Metas</a>
+          <a href="relatorios.html" class="text-gray-600 hover:text-primary">Relatórios</a>
+          <a href="config.html" class="text-gray-600 hover:text-primary">Configurações</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+          <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white cursor-pointer">
+            <i class="fas fa-user"></i>
+          </div>
+          <button class="md:hidden text-gray-600" id="mobileMenuButton">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="hidden md:hidden bg-white py-2 px-4 shadow-md">
+        <a href="index.html" class="block py-2 text-gray-600 hover:text-primary">Resumo</a>
+        <a href="transacoes.html" class="block py-2 text-gray-600 hover:text-primary">Transações</a>
+        <a href="metas.html" class="block py-2 text-primary font-medium">Metas</a>
+        <a href="relatorios.html" class="block py-2 text-gray-600 hover:text-primary">Relatórios</a>
+        <a href="config.html" class="block py-2 text-gray-600 hover:text-primary">Configurações</a>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold text-dark">Minhas Metas Financeiras</h2>
+        <button onclick="openModal('addGoalModal')" class="bg-primary hover:bg-blue-600 text-white py-2 px-4 rounded-md flex items-center">
+          <i class="fas fa-plus mr-2"></i> Nova Meta
+        </button>
+      </div>
+
+      <!-- Cards de Metas -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="goalsList">
+        <!-- Metas serão carregadas aqui -->
+      </div>
+
+      <!-- Calculadora de Metas -->
+      <div class="bg-white p-6 rounded-lg shadow-sm">
+        <h2 class="text-lg font-semibold text-dark mb-6">Calculadora de Metas</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <form id="savingsCalculator" class="space-y-4">
+              <div>
+                <label for="goalTarget" class="block text-sm font-medium text-gray-700 mb-1">Valor da Meta</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-gray-500">R$</span>
+                  </div>
+                  <input type="number" id="goalTarget" class="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="5.000" required>
+                </div>
+              </div>
+              
+              <div>
+                <label for="goalPeriod" class="block text-sm font-medium text-gray-700 mb-1">Prazo (meses)</label>
+                <input type="number" id="goalPeriod" class="block w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="12" required>
+              </div>
+              
+              <div>
+                <label for="goalMonthly" class="block text-sm font-medium text-gray-700 mb-1">Economia Mensal</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-gray-500">R$</span>
+                  </div>
+                  <input type="number" id="goalMonthly" class="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="500" required>
+                </div>
+              </div>
+              
+              <button type="button" onclick="FinanceApp.calculateGoal()" class="w-full bg-primary hover:bg-blue-600 text-white py-2 px-4 rounded-md">
+                Calcular
+              </button>
+            </form>
+          </div>
+          
+          <div>
+            <div id="goalResult" class="bg-blue-50 p-4 rounded-lg hidden">
+              <h3 class="font-semibold text-lg text-dark mb-3">Resultado da Simulação</h3>
+              <div class="space-y-3">
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Valor da meta:</span>
+                  <span id="resultTarget" class="font-medium">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Economia mensal necessária:</span>
+                  <span id="resultRequired" class="font-medium text-secondary">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Sua economia mensal:</span>
+                  <span id="resultSavings" class="font-medium">R$ 0,00</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Tempo para alcançar:</span>
+                  <span id="resultTime" class="font-medium">0 meses</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Diferença mensal:</span>
+                  <span id="resultDifference" class="font-medium">R$ 0,00</span>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <button onclick="FinanceApp.saveGoalFromCalculator()" class="w-full bg-secondary hover:bg-green-600 text-white py-2 px-4 rounded-md">
+                  Salvar como Meta
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal para adicionar/editar meta -->
+  <div id="addGoalModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+        <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+      </div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 id="goalModalTitle" class="text-lg leading-6 font-medium text-gray-900 mb-4">Nova Meta</h3>
+              <form id="goalForm" class="space-y-4">
+                <div>
+                  <label for="goalName" class="block text-sm font-medium text-gray-700 mb-1">Nome da Meta</label>
+                  <input type="text" id="goalName" class="block w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="Ex: Viagem para Europa" required>
+                </div>
+                <div>
+                  <label for="goalTargetAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor Alvo</label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-gray-500">R$</span>
+                    </div>
+                    <input type="number" id="goalTargetAmount" class="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="10.000" required>
+                  </div>
+                </div>
+                <div>
+                  <label for="goalCurrentAmount" class="block text-sm font-medium text-gray-700 mb-1">Valor Atual</label>
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-gray-500">R$</span>
+                    </div>
+                    <input type="number" id="goalCurrentAmount" class="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="1.500" required>
+                  </div>
+                </div>
+                <div>
+                  <label for="goalDeadline" class="block text-sm font-medium text-gray-700 mb-1">Data Limite</label>
+                  <input type="date" id="goalDeadline" class="block w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" required>
+                </div>
+                <div>
+                  <label for="goalDescription" class="block text-sm font-medium text-gray-700 mb-1">Descrição (opcional)</label>
+                  <textarea id="goalDescription" rows="3" class="block w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary" placeholder="Ex: Economizar para viagem de 15 dias"></textarea>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" id="submitGoal" onclick="FinanceApp.handleGoalSubmit()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm">
+            Salvar
+          </button>
+          <button type="button" onclick="closeModal('addGoalModal')" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="db.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Menu mobile
+    document.getElementById('mobileMenuButton').addEventListener('click', function() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    });
+    // Configura data limite padrão para 1 mês à frente
+    document.addEventListener('DOMContentLoaded', function() {
+      const deadlineInput = document.getElementById('goalDeadline');
+      if (deadlineInput) {
+        const nextMonth = new Date();
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        deadlineInput.value = nextMonth.toISOString().split('T')[0];
+      }
+    });
+  </script>
+</body>
+</html>
